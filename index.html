@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Pulse — African Warrior</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--gold:#C8922A;--deep:#0D0D0B;--warm:#1A1710;--rust:#B84B2A;--cream:#FAF6EE;--text:#1C1A14;--muted:#7A7060;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+    header{background:var(--deep);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--gold);}
+    .logo{font-family:'Space Mono',monospace;color:var(--gold);font-size:0.85rem;letter-spacing:0.2em;text-transform:uppercase;text-decoration:none;}
+    .logo span{color:#fff;}
+    .header-nav{display:flex;gap:2rem;}
+    .header-nav a{color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'Space Mono',monospace;}
+    .header-nav a:hover{color:var(--gold);}
+    .hero{background:var(--deep);padding:4rem 2rem 3.5rem;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(200,146,42,0.15) 0%,transparent 70%);pointer-events:none;}
+    .hero-eyebrow{font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:900;color:#fff;line-height:1.05;margin-bottom:1.2rem;}
+    .hero h1 em{color:var(--gold);font-style:italic;}
+    .hero-sub{font-size:1rem;color:rgba(255,255,255,0.55);max-width:520px;margin:0 auto 2.5rem;line-height:1.7;font-weight:300;}
+    .filters{display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center;}
+    .filter-btn{background:transparent;border:1px solid rgba(200,146,42,0.4);color:rgba(255,255,255,0.6);padding:0.45rem 1.1rem;border-radius:999px;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+    .filter-btn:hover,.filter-btn.active{background:var(--gold);border-color:var(--gold);color:var(--deep);font-weight:500;}
+    .main{max-width:1200px;margin:0 auto;padding:3rem 1.5rem 5rem;}
+    .status-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid rgba(0,0,0,0.1);}
+    .status-left{display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--muted);font-family:'Space Mono',monospace;}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse-dot 2s infinite;}
+    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+    .refresh-btn{background:none;border:1px solid rgba(0,0,0,0.15);color:var(--muted);padding:0.35rem 0.9rem;border-radius:6px;font-size:0.75rem;font-family:'Space Mono',monospace;cursor:pointer;display:flex;align-items:center;gap:0.4rem;transition:all 0.2s;}
+    .refresh-btn:hover{border-color:var(--gold);color:var(--gold);}
+    .refresh-btn.spinning svg{animation:spin 1s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #loading{text-align:center;padding:5rem 2rem;}
+    .loader-ring{width:48px;height:48px;border:3px solid rgba(200,146,42,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 1.5rem;}
+    #loading p{color:var(--muted);font-family:'Space Mono',monospace;font-size:0.78rem;letter-spacing:0.1em;}
+    #error-msg{display:none;text-align:center;padding:4rem 2rem;background:#fff8f6;border:1px solid rgba(184,75,42,0.2);border-radius:12px;}
+    #error-msg h3{font-family:'Playfair Display',serif;color:var(--rust);margin-bottom:0.5rem;}
+    #error-msg p{color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem;}
+    #error-detail{font-family:'Space Mono',monospace;font-size:0.75rem;background:#f5f0e8;padding:0.75rem;border-radius:6px;margin:0.5rem 0 1rem;text-align:left;word-break:break-all;}
+    .retry-btn{background:var(--gold);color:var(--deep);border:none;padding:0.6rem 1.5rem;border-radius:8px;font-weight:600;cursor:pointer;}
+    #news-grid{display:none;}
+    .featured-row{display:grid;grid-template-columns:1.6fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+    .news-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:1.5rem;}
+    .card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,0.07);transition:transform 0.25s,box-shadow 0.25s;text-decoration:none;color:inherit;display:flex;flex-direction:column;opacity:0;transform:translateY(20px);}
+    .card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.1);}
+    .card.visible{animation:fadeUp 0.5s ease forwards;}
+    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+    .card-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
+    .card-img-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--warm) 0%,#2d2508 100%);display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+    .card.featured .card-img,.card.featured .card-img-placeholder{aspect-ratio:4/3;}
+    .card-body{padding:1.25rem;flex:1;display:flex;flex-direction:column;}
+    .card-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;}
+    .card h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;line-height:1.35;margin-bottom:0.6rem;}
+    .card.featured h3{font-size:1.4rem;}
+    .card-desc{font-size:0.85rem;color:var(--muted);line-height:1.6;flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+    .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:0.75rem;border-top:1px solid rgba(0,0,0,0.06);}
+    .card-source{font-size:0.72rem;color:var(--muted);font-family:'Space Mono',monospace;}
+    .card-date{font-size:0.7rem;color:rgba(0,0,0,0.3);}
+    .read-arrow{color:var(--gold);font-size:1rem;transition:transform 0.2s;}
+    .card:hover .read-arrow{transform:translateX(4px);}
+    .section-label{font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem;}
+    .section-label::after{content:'';flex:1;height:1px;background:rgba(0,0,0,0.08);}
+    .page-footer{text-align:center;padding:2rem;border-top:1px solid rgba(0,0,0,0.08);margin-top:2rem;}
+    .page-footer p{font-size:0.78rem;color:var(--muted);font-family:'Space Mono',monospace;}
+    .page-footer a{color:var(--gold);text-decoration:none;}
+    @media(max-width:900px){.featured-row{grid-template-columns:1fr}.news-row{grid-template-columns:1fr 1fr}.header-nav{display:none}}
+    @media(max-width:600px){.news-row{grid-template-columns:1fr}.hero h1{font-size:2.4rem}}
+  </style>
+</head>
+<body>
+<header>
+  <a class="logo" href="https://www.awmagazine.org"><span>African </span>Warrior</a>
+  <nav class="header-nav">
+    <a href="https://www.awmagazine.org/blog1">Stories</a>
+    <a href="https://www.awmagazine.org/expeditions">Expeditions</a>
+    <a href="https://www.awmagazine.org/advisory">Advisory</a>
+    <a href="https://www.awmagazine.org/subscribe">Subscribe</a>
+  </nav>
+</header>
+<section class="hero">
+  <p class="hero-eyebrow">✦ Live Feed · Updated Automatically</p>
+  <h1>The <em>Pulse</em><br/>of Africa</h1>
+  <p class="hero-sub">Positive stories from across the continent and the diaspora — curated by AI, refreshed automatically. No noise. Just momentum.</p>
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">All Stories</button>
+    <button class="filter-btn" data-filter="business">Business</button>
+    <button class="filter-btn" data-filter="innovation">Innovation</button>
+    <button class="filter-btn" data-filter="culture">Culture</button>
+    <button class="filter-btn" data-filter="diaspora">Diaspora</button>
+    <button class="filter-btn" data-filter="health">Health</button>
+  </div>
+</section>
+<main class="main">
+  <div class="status-bar">
+    <div class="status-left"><div class="live-dot"></div><span id="story-count">Loading stories…</span></div>
+    <button class="refresh-btn" id="refresh-btn" onclick="loadNews(true)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      Refresh
+    </button>
+  </div>
+  <div id="loading"><div class="loader-ring"></div><p>Curating stories from the continent…</p></div>
+  <div id="error-msg">
+    <h3>Couldn't load stories</h3>
+    <p>Error details:</p>
+    <div id="error-detail">—</div>
+    <button class="retry-btn" onclick="loadNews(true)">Try Again</button>
+  </div>
+  <div id="news-grid"></div>
+</main>
+<footer class="page-footer">
+  <p>The Pulse is powered by AI · Part of <a href="https://www.awmagazine.org">African Warrior</a> · Stories refresh automatically</p>
+</footer>
+<script>
+  const EMOJIS=['🌍','🦁','✨','🌟','🏆','🎯','💫','🌺','🦅','🌄','🎨','🚀'];
+  const CATS={business:['business','economy','investment','startup','fintech','market'],innovation:['tech','technology','innovation','ai','digital','science'],culture:['art','music','film','fashion','culture','sport'],diaspora:['diaspora','african american','british african','afro'],health:['health','medicine','hospital','wellness','vaccine','doctor']};
+  let allArticles=[],activeFilter='all',lastFetched=null;
+  function tagCat(a){const t=`${a.title} ${a.description||''}`.toLowerCase();for(const[c,kw]of Object.entries(CATS)){if(kw.some(k=>t.includes(k)))return c;}return'general';}
+  function timeAgo(d){const diff=Date.now()-new Date(d).getTime(),mins=Math.floor(diff/60000),hrs=Math.floor(mins/60),days=Math.floor(hrs/24);return days>0?`${days}d ago`:hrs>0?`${hrs}h ago`:mins>0?`${mins}m ago`:'Just now';}
+  function catLabel(c){return{business:'Business',innovation:'Innovation',culture:'Culture',diaspora:'Diaspora',health:'Health',general:'Africa'}[c]||'Africa';}
+  function buildCard(a,featured=false){
+    const emoji=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const cat=a._category||tagCat(a);
+    const img=a.urlToImage?`<img class="card-img" src="${a.urlToImage}" alt="" loading="lazy" onerror="this.outerHTML='<div class=card-img-placeholder>${emoji}</div>'">`:`<div class="card-img-placeholder">${emoji}</div>`;
+    return`<a class="card${featured?' featured':''}" href="${a.url||'#'}" target="_blank" rel="noopener">${img}<div class="card-body"><span class="card-tag">${catLabel(cat)}${a.country?' · '+a.country:''}</span><h3>${a.title}</h3><p class="card-desc">${a.description||''}</p><div class="card-footer"><div><div class="card-source">${a.source?.name||'Africa News'}</div><div class="card-date">${timeAgo(a.publishedAt||new Date())}</div></div><span class="read-arrow">→</span></div></div></a>`;
+  }
+  function renderGrid(articles){
+    const grid=document.getElementById('news-grid');
+    if(!articles.length){grid.innerHTML=`<p style="text-align:center;color:var(--muted);padding:3rem;">No stories for this filter.</p>`;return;}
+    let html=`<p class="section-label">Top Stories</p><div class="featured-row">${buildCard(articles[0],true)}${articles[1]?buildCard(articles[1]):''}</div>`;
+    const rest=articles.slice(2);
+    if(rest.length){html+=`<p class="section-label">More From The Continent</p>`;for(let i=0;i<rest.length;i+=3){html+=`<div class="news-row">${rest.slice(i,i+3).map(a=>buildCard(a)).join('')}</div>`;}}
+    grid.innerHTML=html;
+    setTimeout(()=>grid.querySelectorAll('.card').forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*60)),50);
+  }
+  function applyFilter(f){activeFilter=f;renderGrid(f==='all'?allArticles:allArticles.filter(a=>(a._category||tagCat(a))===f));}
+  async function loadNews(force=false){
+    if(!force&&lastFetched&&Date.now()-lastFetched<30*60*1000&&allArticles.length){applyFilter(activeFilter);return;}
+    const loading=document.getElementById('loading'),errorMsg=document.getElementById('error-msg'),grid=document.getElementById('news-grid'),btn=document.getElementById('refresh-btn'),count=document.getElementById('story-count');
+    loading.style.display='block';errorMsg.style.display='none';grid.style.display='none';btn.classList.add('spinning');count.textContent='Curating stories…';
+    try{
+      const resp=await fetch('/.netlify/functions/get-news');
+      const data=await resp.json();
+      if(data.error) throw new Error(data.error);
+      if(!Array.isArray(data)) throw new Error('Unexpected response: '+JSON.stringify(data).slice(0,100));
+      allArticles=data.map(a=>({...a,_category:a.category||tagCat(a)}));
+      lastFetched=Date.now();
+      count.textContent=`${allArticles.length} stories · Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+      loading.style.display='none';grid.style.display='block';
+      applyFilter(activeFilter);
+    }catch(err){
+      loading.style.display='none';errorMsg.style.display='block';
+      document.getElementById('error-detail').textContent=err.message;
+    }finally{btn.classList.remove('spinning');}
+  }
+  document.querySelectorAll('.filter-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');applyFilter(btn.dataset.filter);
+  }));
+  setInterval(()=>loadNews(true),30*60*1000);
+  loadNews();
+</script>
+</body>
+</html>
